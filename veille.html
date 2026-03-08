@@ -1,0 +1,722 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Veille Technologique — VPN</title>
+
+  <style>
+    /* ===== THEME SOMBRE (comme ta première version) ===== */
+    :root{
+      --bg:#0b1020;
+      --text:#e9ecff;
+      --muted:#b6bce2;
+      --border: rgba(255,255,255,.12);
+      --soft: rgba(255,255,255,.06);
+      --soft2: rgba(255,255,255,.03);
+
+      --accent:#6d4bff;     /* violet */
+      --accent2:#2fe6b8;    /* vert */
+      --blue:#1f3cff;       /* bleu navbar active */
+
+      --radius:18px;
+      --radius2:14px;
+      --max:1100px;
+      --shadow: 0 18px 60px rgba(0,0,0,.35);
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: var(--sans);
+      color: var(--text);
+      line-height: 1.55;
+      background:
+        radial-gradient(900px 500px at 10% 10%, rgba(109,75,255,.35), transparent 55%),
+        radial-gradient(700px 500px at 90% 20%, rgba(47,230,184,.18), transparent 55%),
+        radial-gradient(800px 600px at 50% 100%, rgba(31,60,255,.10), transparent 55%),
+        var(--bg);
+    }
+    a{ color:inherit; }
+    .container{ width:min(var(--max), 92vw); margin:0 auto; }
+
+    /* ================= NAVBAR (style photo, mais sur fond sombre) ================= */
+    header{
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(255,255,255,.92);  /* ✅ navbar blanche comme la photo */
+      color: #111827;
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(0,0,0,.08);
+    }
+    .nav{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      height:72px;
+      gap:14px;
+    }
+
+    /* Logo gauche */
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width: 120px;
+    }
+    .brand .logo{
+      width:34px; height:34px;
+      display:grid; place-items:center;
+      border-radius:10px;
+      background:#fff;
+      border:1px solid rgba(0,0,0,.10);
+    }
+    .brand .ym{
+      font-weight:900;
+      letter-spacing:.4px;
+      font-size:18px;
+    }
+
+    /* Menu centré */
+    nav.menu{
+      flex:1;
+      display:flex;
+      justify-content:center;
+      gap:34px;
+      font-weight:700;
+    }
+    nav.menu a{
+      color:#111827;
+      text-decoration:none;
+      padding: 10px 4px;
+      position:relative;
+    }
+    nav.menu a:hover{ color: var(--blue); }
+
+    /* actif */
+    nav.menu a.active{
+      color: var(--blue);
+    }
+    nav.menu a.active::after{
+      content:"";
+      position:absolute;
+      left:0; right:0;
+      bottom:2px;
+      height:3px;
+      background: var(--blue);
+      border-radius:999px;
+    }
+
+    /* burger mobile */
+    .burger{
+      display:none;
+      border:1px solid rgba(0,0,0,.12);
+      background:#fff;
+      border-radius:12px;
+      padding:10px 12px;
+      cursor:pointer;
+      font-weight:800;
+      color:#111827;
+    }
+
+    /* ================= HERO ================= */
+    .hero{ padding: 28px 0 10px; }
+    .hero-card{
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, var(--soft), var(--soft2));
+      box-shadow: var(--shadow);
+      padding: 18px;
+      position:relative;
+      overflow:hidden;
+    }
+    .hero-card::before{
+      content:"";
+      position:absolute; inset:-2px;
+      background:
+        radial-gradient(620px 220px at 20% 0%, rgba(109,75,255,.34), transparent 60%),
+        radial-gradient(460px 200px at 90% 30%, rgba(47,230,184,.22), transparent 60%);
+      pointer-events:none;
+      opacity:.9;
+    }
+    .hero-card > *{ position:relative; }
+
+    h1{
+      margin:0 0 8px;
+      font-size: clamp(26px, 2.6vw, 40px);
+      letter-spacing: -.6px;
+      line-height: 1.15;
+    }
+    .subtitle{
+      margin:0 0 14px;
+      color: var(--muted);
+      max-width: 80ch;
+      font-size: 15.5px;
+    }
+    .meta-row{
+      display:flex; flex-wrap:wrap; gap:10px;
+      margin-top: 8px;
+    }
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.18);
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 13px;
+    }
+    .kbd{
+      font-family: var(--mono);
+      font-size: 12px;
+      padding: 2px 6px;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: 8px;
+      background: rgba(0,0,0,.16);
+      color: var(--text);
+    }
+
+    .controls{
+      margin: 14px 0 0;
+      display:flex; flex-wrap:wrap; gap:10px;
+      align-items:center; justify-content:space-between;
+    }
+    .search{
+      flex:1 1 320px;
+      display:flex; gap:10px; align-items:center;
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background: rgba(0,0,0,.16);
+    }
+    .search input{
+      width:100%;
+      border:none;
+      outline:none;
+      font-size:14px;
+      color:var(--text);
+      background:transparent;
+    }
+    .search input::placeholder{ color: rgba(182,188,226,.75); }
+
+    select, button{
+      font:inherit;
+      border:1px solid var(--border);
+      background: rgba(255,255,255,.06);
+      border-radius:999px;
+      padding:10px 12px;
+      cursor:pointer;
+      color: var(--text);
+      transition:.15s ease;
+    }
+    button.primary{
+      background: rgba(109,75,255,.18);
+      border-color: rgba(109,75,255,.55);
+      font-weight:850;
+    }
+    button.ghost{ background: transparent; }
+    select:hover, button:hover{
+      transform: translateY(-1px);
+      border-color: rgba(109,75,255,.55);
+    }
+
+    /* ================= MAIN ================= */
+    main{ padding: 12px 0 44px; }
+    .section{
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(255,255,255,.10);
+    }
+    .section:first-of-type{ border-top:none; padding-top:0; }
+    .section h2{
+      margin:0 0 6px;
+      font-size:18px;
+    }
+    .desc{
+      margin:0 0 12px;
+      color: var(--muted);
+      font-size: 13.5px;
+    }
+
+    .block{
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius2);
+      background: rgba(255,255,255,.03);
+      padding: 14px;
+    }
+    .block p{ margin:0 0 10px; color: var(--muted); }
+    .block p:last-child{ margin:0; }
+    .block strong{ color: var(--text); }
+    .block code{
+      font-family: var(--mono);
+      font-size: 12.5px;
+      padding:2px 6px;
+      border-radius: 8px;
+      border: 1px solid rgba(109,75,255,.25);
+      background: rgba(109,75,255,.10);
+      color: var(--text);
+    }
+
+    /* Timeline légère */
+    .timeline{
+      position:relative;
+      padding-left: 22px;
+      display:flex; flex-direction:column;
+    }
+    .timeline::before{
+      content:"";
+      position:absolute;
+      left:9px; top:0; bottom:0;
+      width:2px;
+      background: linear-gradient(var(--accent), rgba(255,255,255,0));
+      opacity:.7;
+    }
+    .entry{
+      display:grid;
+      grid-template-columns: 18px 1fr;
+      gap:12px;
+      padding: 12px 0;
+    }
+    .entry + .entry{
+      border-top: 1px solid rgba(255,255,255,.10);
+    }
+    .dot2{
+      width:12px; height:12px;
+      border-radius:50%;
+      margin-top: 6px;
+      background: var(--accent2);
+      box-shadow: 0 0 0 5px rgba(47,230,184,.14);
+    }
+    .entry .content{
+      padding: 12px;
+      border-radius: var(--radius2);
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      transition: .15s ease;
+    }
+    .entry .content:hover{
+      transform: translateY(-2px);
+      border-color: rgba(109,75,255,.45);
+      background: rgba(109,75,255,.08);
+    }
+    .entry h3{ margin:0; font-size: 15px; }
+    .meta{
+      display:flex; flex-wrap:wrap; gap:8px;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 12.5px;
+    }
+    .badge{
+      font-size: 11px;
+      padding: 5px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.14);
+      color: var(--muted);
+      white-space:nowrap;
+    }
+    .tag{
+      font-size: 11px;
+      padding: 5px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(47,230,184,.25);
+      background: rgba(47,230,184,.08);
+      color: var(--text);
+      white-space:nowrap;
+    }
+    .entry p{ margin: 6px 0 0; color: var(--muted); font-size: 13.5px; }
+    .entry a{
+      display:inline-block;
+      margin-top: 8px;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      color: var(--text);
+      font-weight: 800;
+    }
+
+    /* Sources */
+    .sources{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .source-item{
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius2);
+      background: rgba(255,255,255,.03);
+      padding:12px;
+    }
+    .source-item .top{
+      display:flex; gap:10px; flex-wrap:wrap;
+      align-items:center; justify-content:space-between;
+    }
+    .source-item small{ color: var(--muted); }
+    .source-item p{ margin:6px 0 0; color: var(--muted); font-size: 13.5px; }
+    .chip{
+      padding:8px 10px;
+      border:1px solid rgba(255,255,255,.16);
+      border-radius:999px;
+      background: rgba(0,0,0,.14);
+      color: var(--text);
+      text-decoration:none;
+      font-weight:800;
+      font-size:13px;
+    }
+    .chip:hover{ border-color: rgba(109,75,255,.55); }
+
+    footer{
+      border-top: 1px solid rgba(255,255,255,.10);
+      padding: 18px 0 28px;
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 10px;
+    }
+
+    /* Mobile */
+    @media (max-width: 900px){
+      nav.menu{
+        position:fixed;
+        left:0; right:0;
+        top:72px;
+        background: rgba(255,255,255,.96);
+        border-bottom:1px solid rgba(0,0,0,.08);
+        padding: 12px 16px;
+        display:none;
+        flex-direction:column;
+        gap:12px;
+        justify-content:flex-start;
+      }
+      nav.menu.open{ display:flex; }
+      nav.menu a{ color:#111827; }
+      nav.menu a.active{ color: var(--blue); }
+      .burger{ display:inline-flex; align-items:center; gap:8px; }
+      .brand{ min-width:auto; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- NAVBAR -->
+  <header>
+    <div class="container">
+      <div class="nav">
+        <div class="brand">
+          <div class="logo" aria-hidden="true">
+            <!-- petit svg "bloc" -->
+            <a href="index.html#home"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 2l8 4.5v9L12 20l-8-4.5v-9L12 2z" stroke="#111827" stroke-width="1.6"/>
+              <path d="M12 2v18" stroke="#111827" stroke-width="1.2" opacity=".55"/>
+              <path d="M4 6.5l8 4.5 8-4.5" stroke="#111827" stroke-width="1.2" opacity=".55"/>
+            </svg></a>
+          </div>
+          <div class="ym" >YM</div>
+        </div>
+
+        <nav class="menu" id="menu">
+          <a href="index.html#">Accueil</a>
+          <a href="index.html#about">À Propos</a>
+          <a href="index.html#skills">Compétences</a>
+          <a href="index.html#education">Éducation</a>
+          <a href="index.html#work">Réalisations</a>
+          <a href="index.html#experience">Experiences</a>
+          <a href="index.html#veille">Veille</a>
+          <a href="index.html#contact">Contact</a>
+        </nav>
+
+        <button class="burger" id="burger" type="button">☰ Menu</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <div class="container hero" id="veille">
+    <div class="hero-card">
+      <h1>Veille technologique — VPN</h1>
+      <p class="subtitle">
+        Définition du VPN, articles importants montrant l’évolution au fil des mois, outils de veille utilisés
+        (Google Alerts, Feedly) et sources consultées.
+      </p>
+
+      <div class="meta-row">
+        <span class="pill"><span class="dot"></span> Dernière modification: <span id="lastUpdate">20 février 2026</span></span>
+       
+      </div>
+
+      <div class="controls" aria-label="Recherche et filtres">
+        <div class="search" role="search">
+          <span aria-hidden="true">🔎</span>
+          <input id="q" type="search" />
+        </div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+          <select id="theme">
+            <option value="all">Tous les thèmes</option>
+            <option value="protocoles">Protocoles</option>
+            <option value="vulnerabilites">Vulnérabilités</option>
+            <option value="tendances">Tendances</option>
+            <option value="reference">Références</option>
+          </select>
+          <button class="ghost" id="reset" type="button">Réinitialiser</button>
+          <button class="primary" id="sort" type="button">Tri: récent → ancien</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <main class="container">
+    <!-- DEFINITION -->
+    <section class="section" id="definition">
+      <h2>Définition du VPN</h2>
+
+      <div class="block">
+        <p>
+          Un <strong>VPN</strong> (<em>Virtual Private Network</em>) est une technologie qui crée un
+          <strong>tunnel chiffré</strong> entre ton appareil et un serveur VPN (ou un réseau d’entreprise).
+          Le but est de <strong>sécuriser la connexion</strong> par exemple lorsqu'on utilise un Wi-Fi public, et aussi de <strong>permettre l’accès distant</strong>.
+        </p>
+        <p>
+          Le VPN protège surtout le trafic <em>entre toi et le serveur VPN</em>. Il ne rend pas “anonyme” à 100% :
+          il faut aussi gérer l’authentification (ex: <strong>MFA</strong>), les réglages DNS et les mises à jour.
+        </p>
+        <p>Protocoles : <code>WireGuard</code>, <code>OpenVPN</code>, <code>IPsec</code>.</p>
+      </div>
+    </section>
+
+    <!-- ARTICLES -->
+    <section class="section" id="articles">
+      <h2>Articles importants (évolution au fil des mois)</h2>
+      <div class="timeline" id="articlesList" aria-live="polite"></div>
+    </section>
+
+    <!-- OUTILS -->
+    <section class="section" id="outils">
+      <h2>Outils utilisés pour faire ma veille</h2>
+      <p class="desc">Collecte → tri → synthèse.</p>
+
+      <div class="block">
+        <ul style="margin:0; padding-left:18px; color:var(--muted);">
+          <li><strong style="color:var(--text)">Google Alerts</strong> : alertes sur “VPN CVE”, “WireGuard”, “ZTNA”, “VPN vulnerability”, "VPN securité"…</li>
+          <li><strong style="color:var(--text)">Feedly</strong> : flux RSS (blogs sécurité, PSIRT éditeurs, CERT) classés par dossiers.</li>
+          <li><strong style="color:var(--text)">Linkedin</strong> : R
+            date + source + résumé + mots-clés + conclusion.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- SOURCES -->
+    <section class="section" id="sources">
+      <h2>Sources des sites utilisés</h2>
+      <div class="sources" id="sourcesList"></div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <div style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; align-items:center;">
+        <div>&copy; 2026 Portfolio MILED Yousri</div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /* ===== Données (modifie ici tes articles + tes sources) ===== */
+    const ARTICLES = [
+      {
+        date: "2025-02-12",
+        theme: "protocoles",
+        tag: "Protocoles",
+        title: "WireGuard : adoption et avantages (simplicité, performance)",
+        source: "WireGuard (site officiel)",
+        resume: "Évolution vers des protocoles plus légers. À noter : la sécurité dépend aussi de la configuration.",
+        url: "https://www.wireguard.com/"
+      },
+      {
+        date: "2025-05-20",
+        theme: "tendances",
+        tag: "Tendances",
+        title: "Zero Trust : évolution au-delà du VPN classique",
+        source: "NIST SP 800-207 (PDF)",
+        resume: "Référence sur Zero Trust : montée du ZTNA (accès applicatif) plutôt que VPN donnant accès réseau complet.",
+        url: "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-207.pdf"
+      },
+      {
+        date: "2025-09-18",
+        theme: "vulnerabilites",
+        tag: "Vulnérabilités",
+        title: "Veille CVE : vulnérabilités exploitées activement (VPN/edge)",
+        source: "CISA — KEV Catalog",
+        resume: "Suivre les CVE exploitées activement et appliquer rapidement les patchs : point clé de la veille sécurité.",
+        url: "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+      },
+      {
+        date: "2025-12-07",
+        theme: "tendances",
+        tag: "Tendances",
+        title: "Obfuscation / anti-censure : rendre le trafic VPN moins détectable",
+        source: "Mullvad (blog)",
+        resume: "Certaines solutions ajoutent de l’obfuscation pour passer des restrictions/réseaux filtrés.",
+        url: "https://mullvad.net/en/blog/"
+      },
+      {
+        date: "2026-01-10",
+        theme: "reference",
+        tag: "Références",
+        title: "Bonnes pratiques : DNS, split tunneling, kill switch, MFA",
+        source: "Cloudflare (Learning Center)",
+        resume: "Checklist pour conclure : tests de fuites DNS/WebRTC/IPv6 + MFA + moindre privilège.",
+        url: "https://www.cloudflare.com/learning/access-management/what-is-a-vpn/"
+      }
+    ];
+
+    const SOURCES = [
+      {
+        name: "WireGuard (site officiel)",
+        type: "Docs / Protocole",
+        why: "Comprendre l’architecture du protocole et les bases techniques.",
+        url: "https://www.wireguard.com/"
+      },
+      {
+        name: "NIST (SP 800-207)",
+        type: "Référence officielle",
+        why: "Source solide pour parler de Zero Trust / ZTNA et de l’évolution au-delà du VPN.",
+        url: "https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-207.pdf"
+      },
+      {
+        name: "CISA — KEV Catalog",
+        type: "Organisme cybersécurité",
+        why: "Suivre les vulnérabilités exploitées activement (utile dans une veille VPN).",
+        url: "https://www.cisa.gov/known-exploited-vulnerabilities-catalog"
+      },
+      {
+        name: "Mullvad (blog)",
+        type: "Blog officiel (VPN)",
+        why: "Suivre des évolutions techniques (obfuscation, nouvelles options, annonces).",
+        url: "https://mullvad.net/en/blog/"
+      },
+      {
+        name: "Cloudflare (Learning Center)",
+        type: "Pédagogie",
+        why: "Définitions + explications accessibles + bonnes pratiques.",
+        url: "https://www.cloudflare.com/learning/access-management/what-is-a-vpn/"
+      }
+    ];
+
+    /* ===== UI ===== */
+    const $ = (sel, root=document) => root.querySelector(sel);
+
+    const menu = $("#menu");
+    const burger = $("#burger");
+
+    const input = $("#q");
+    const themeSelect = $("#theme");
+    const resetBtn = $("#reset");
+    const sortBtn = $("#sort");
+    const list = $("#articlesList");
+    const sourcesList = $("#sourcesList");
+
+    let sortDesc = true;
+
+    // date update
+    
+
+    // burger mobile
+    burger?.addEventListener("click", () => menu.classList.toggle("open"));
+
+    // Ctrl/Cmd + K focus search
+    document.addEventListener("keydown", (e) => {
+      const isMac = navigator.platform.toLowerCase().includes("mac");
+      const mod = isMac ? e.metaKey : e.ctrlKey;
+      if (mod && e.key.toLowerCase() === "k") { e.preventDefault(); input.focus(); }
+      if (e.key === "Escape") { input.value = ""; render(); }
+    });
+
+    function normalize(str){
+      return (str || "")
+        .toLowerCase()
+        .normalize("NFD").replace(/\p{Diacritic}/gu, "");
+    }
+
+    function compareDates(a,b){
+      return sortDesc ? b.date.localeCompare(a.date) : a.date.localeCompare(b.date);
+    }
+
+    function render(){
+      const q = normalize(input.value.trim());
+      const theme = themeSelect.value;
+
+      const data = [...ARTICLES]
+        .sort(compareDates)
+        .filter(a => {
+          const hay = normalize([a.title, a.source, a.resume, a.tag, a.theme, a.date].join(" "));
+          const matchQ = !q || hay.includes(q);
+          const matchTheme = (theme === "all") || (a.theme === theme);
+          return matchQ && matchTheme;
+        });
+
+      list.innerHTML = data.map(a => {
+        const d = new Date(a.date + "T00:00:00");
+        const dateFR = d.toLocaleDateString("fr-FR", { year:"numeric", month:"long", day:"numeric" });
+
+        return `
+          <div class="entry">
+            <div class="dot2" aria-hidden="true"></div>
+            <div class="content">
+              <div class="meta">
+                <span class="badge">📅 ${dateFR}</span>
+                <span class="badge">📰 ${a.source}</span>
+                <span class="tag">🏷️ ${a.tag}</span>
+              </div>
+              <h3>${a.title}</h3>
+              <p>${a.resume}</p>
+              <a href="${a.url}" target="_blank" rel="noopener">Ouvrir la source</a>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      $("#countVisible").textContent = String(data.length);
+    }
+
+    function renderSources(){
+      sourcesList.innerHTML = SOURCES.map(s => `
+        <div class="source-item">
+          <div class="top">
+            <div>
+              <strong>${s.name}</strong><br/>
+              <small>${s.type}</small>
+            </div>
+            <a class="chip" href="${s.url}" target="_blank" rel="noopener">Visiter</a>
+          </div>
+          <p>${s.why}</p>
+        </div>
+      `).join("");
+    }
+
+    input.addEventListener("input", render);
+    themeSelect.addEventListener("change", render);
+
+    resetBtn.addEventListener("click", () => {
+      input.value = "";
+      themeSelect.value = "all";
+      sortDesc = true;
+      sortBtn.textContent = "Tri: récent → ancien";
+      render();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    sortBtn.addEventListener("click", () => {
+      sortDesc = !sortDesc;
+      sortBtn.textContent = sortDesc ? "Tri: récent → ancien" : "Tri: ancien → récent";
+      render();
+    });
+
+    renderSources();
+    render();
+  </script>
+</body>
+</html>
